@@ -5,12 +5,13 @@ import App from './App';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import LandingPage from './components/landing/LandingPage';
+import UserProfile from './pages/UserProfile';
 import { Toaster } from 'react-hot-toast';
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuthStore();
-  const hasVisitedBefore = localStorage.getItem('snippix-visited');
+  const hasVisitedBefore = localStorage.getItem('codepix-visited');
   
   if (!isAuthenticated && !hasVisitedBefore) {
     return <Navigate to="/welcome" replace />;
@@ -63,10 +64,9 @@ export default function AppRouter() {
         {/* Public Routes */}
         <Route 
           path="/welcome" 
-          element={
-            <LandingPage 
+          element={            <LandingPage 
               onGetStarted={() => {
-                localStorage.setItem('snippix-visited', 'true');
+                localStorage.setItem('codepix-visited', 'true');
                 window.location.href = '/';
               }} 
             />
@@ -99,6 +99,14 @@ export default function AppRouter() {
               <App />
             </ProtectedRoute>
           } 
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          }
         />
         
         {/* Redirect any unknown routes to home */}

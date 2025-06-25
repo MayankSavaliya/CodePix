@@ -62,12 +62,11 @@ export default function LandingPage({ onGetStarted }) {
     <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 text-white">
       {/* Header */}
       <header className="relative z-10 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">          <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
               <Code className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold">Snippix</h1>
+            <h1 className="text-xl font-bold">CodePix</h1>
           </div>
             <div className="flex items-center gap-4">
             <Button
@@ -168,12 +167,11 @@ export default function LandingPage({ onGetStarted }) {
 
       {/* CTA Section */}
       <section className="px-6 py-20">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">
+        <div className="max-w-4xl mx-auto text-center">          <h2 className="text-4xl font-bold mb-6">
             Ready to Create Amazing Code Snippets?
           </h2>
           <p className="text-xl text-neutral-300 mb-8">
-            Join thousands of developers who use Snippix to share their code beautifully
+            Join thousands of developers who use CodePix to share their code beautifully
           </p>
           
           <Button
@@ -190,11 +188,10 @@ export default function LandingPage({ onGetStarted }) {
       {/* Footer */}
       <footer className="border-t border-neutral-800 px-6 py-8">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between">
-          <div className="flex items-center gap-2 mb-4 md:mb-0">
-            <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded flex items-center justify-center">
+          <div className="flex items-center gap-2 mb-4 md:mb-0">            <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded flex items-center justify-center">
               <Code className="h-4 w-4 text-white" />
             </div>
-            <span className="font-medium">Snippix</span>
+            <span className="font-medium">CodePix</span>
           </div>
           
           <div className="flex items-center gap-6 text-sm text-neutral-400">

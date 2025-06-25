@@ -64,7 +64,10 @@ export default function UserProfile() {
         
         <DropdownMenuSeparator className="bg-neutral-800" />
         
-        <DropdownMenuItem className="text-white hover:bg-neutral-800">
+        <DropdownMenuItem 
+          onClick={() => navigate('/profile')}
+          className="text-white hover:bg-neutral-800"
+        >
           <User className="mr-2 h-4 w-4" />
           Profile
         </DropdownMenuItem>

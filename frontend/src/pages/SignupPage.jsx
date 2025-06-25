@@ -79,20 +79,18 @@ export default function SignupPage() {
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
-          </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-            Snippix
+          </div>          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+            CodePix
           </h1>
           <p className="text-neutral-400 mt-2">Code snippets, beautifully crafted</p>
         </div>
 
         <Card className="bg-neutral-900/80 backdrop-blur-xl border-neutral-800 shadow-2xl">
           <CardHeader className="text-center space-y-2">
-            <CardTitle className="text-2xl font-bold text-white">
-              Create Account
+            <CardTitle className="text-2xl font-bold text-white">              Create Account
             </CardTitle>
             <p className="text-neutral-400">
-              Join Snippix to save and sync your snippets
+              Join CodePix to save and sync your snippets
             </p>
           </CardHeader>
           

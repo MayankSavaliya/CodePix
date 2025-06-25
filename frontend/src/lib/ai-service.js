@@ -1,111 +1,185 @@
-// AI Service - Centralized AI functionality
-// Simple implementation to connect to the backend API
+class AiService {
+  constructor() {
+    this.baseURL = '/api/ai';
+    this.timeout = 30000; // 30 seconds timeout
+  }
 
-class AiService {  // Code generation function using the backend API
-  async generateCode(prompt, language = 'javascript', complexity = 'simple', modelProvider = 'gemini') {
+  /**
+   * Make HTTP request with proper error handling and timeout
+   * @param {string} endpoint - API endpoint
+   * @param {Object} options - Fetch options
+   * @returns {Promise<Object>} Response data
+   */
+  async makeRequest(endpoint, options = {}) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
     try {
-      // Connect to the backend API (via Vite proxy)
-      const response = await fetch(`/api/ai/generate`, {
-        method: 'POST',
+      const response = await fetch(`${this.baseURL}${endpoint}`, {
         headers: {
           'Content-Type': 'application/json',
+          ...options.headers,
         },
-        body: JSON.stringify({
-          prompt,
-          language,
-          complexity,
-          modelProvider
-        }),
+        signal: controller.signal,
+        ...options,
       });
-      
+
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `API Error: ${response.status}`);
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      // Validate response structure
+      if (!data || typeof data !== 'object') {
+        throw new Error('Invalid response format from server');
+      }
+
+      return data;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      
+      if (error.name === 'AbortError') {
+        throw new Error('Request timed out. Please try again.');
       }
       
-      const data = await response.json();
-      return data.result;
-    } catch (error) {
-      console.error('Error generating code:', error);
-      throw error; // Let the component handle the error
-    }
-  }  // Explain code using backend API
-  async explainCode(code, language, modelProvider = 'gemini') {
-    try {
-      const response = await fetch(`/api/ai/explain`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: code,
-          language,
-          modelProvider
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        throw new Error('Network error. Please check your connection.');
       }
       
-      const data = await response.json();
-      return data.result;
-    } catch (error) {
-      console.error('Error explaining code:', error);
       throw error;
     }
   }
-  // Optimize code using backend API
-  async optimizeCode(code, language, modelProvider = 'gemini') {
+
+  /**
+   * Generate code from natural language description
+   * @param {string} prompt - Natural language description
+   * @param {string} language - Target programming language
+   * @param {string} complexity - Code complexity level
+   * @param {string} modelProvider - AI model provider (gemini/groq)
+   * @returns {Promise<string>} Generated code
+   */
+  async generateCode(prompt, language = 'javascript', complexity = 'intermediate', modelProvider = 'gemini') {
+    if (!prompt || typeof prompt !== 'string') {
+      throw new Error('Prompt is required and must be a string');
+    }
+
+    const data = await this.makeRequest('/generate', {
+      method: 'POST',
+      body: JSON.stringify({
+        prompt: prompt.trim(),
+        language,
+        complexity,
+        modelProvider
+      }),
+    });
+
+    return data.result || '';
+  }
+
+  /**
+   * Explain existing code
+   * @param {string} code - Code to explain
+   * @param {string} language - Programming language
+   * @param {string} modelProvider - AI model provider
+   * @returns {Promise<string>} Code explanation
+   */
+  async explainCode(code, language = 'javascript', modelProvider = 'groq') {
+    if (!code || typeof code !== 'string') {
+      throw new Error('Code is required and must be a string');
+    }
+
+    const data = await this.makeRequest('/explain', {
+      method: 'POST',
+      body: JSON.stringify({
+        prompt: code.trim(),
+        modelProvider
+      }),
+    });
+
+    return data.result || '';
+  }
+
+  /**
+   * Optimize existing code
+   * @param {string} code - Code to optimize
+   * @param {string} language - Programming language
+   * @param {string} modelProvider - AI model provider
+   * @returns {Promise<string>} Optimization suggestions
+   */
+  async optimizeCode(code, language = 'javascript', modelProvider = 'groq') {
+    if (!code || typeof code !== 'string') {
+      throw new Error('Code is required and must be a string');
+    }
+
+    const data = await this.makeRequest('/optimize', {
+      method: 'POST',
+      body: JSON.stringify({
+        code: code.trim(),
+        language,
+        modelProvider
+      }),
+    });
+
+    return data.result || '';
+  }
+
+  /**
+   * Translate code between programming languages
+   * @param {string} code - Source code
+   * @param {string} sourceLanguage - Source programming language
+   * @param {string} targetLanguage - Target programming language
+   * @param {string} modelProvider - AI model provider
+   * @returns {Promise<string>} Translated code
+   */
+  async translateCode(code, sourceLanguage = 'javascript', targetLanguage = 'python', modelProvider = 'gemini') {
+    if (!code || typeof code !== 'string') {
+      throw new Error('Code is required and must be a string');
+    }
+
+    const data = await this.makeRequest('/translate', {
+      method: 'POST',
+      body: JSON.stringify({
+        code: code.trim(),
+        sourceLanguage,
+        targetLanguage,
+        modelProvider
+      }),
+    });
+
+    return data.result || '';
+  }
+
+  /**
+   * Check API status and available endpoints
+   * @returns {Promise<Object>} API status information
+   */
+  async checkStatus() {
     try {
-      const response = await fetch(`/api/ai/optimize`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: code,
-          language,
-          modelProvider
-        }),
-      });
-      
+      const response = await fetch('/api/status');
       if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-      
-      const data = await response.json();
-      return data.result;
+      return await response.json();
     } catch (error) {
-      console.error('Error optimizing code:', error);
-      throw error;
+      throw new Error(`Failed to check API status: ${error.message}`);
     }
   }
-  // Translate code using backend API
-  async translateCode(code, fromLanguage, toLanguage, modelProvider = 'gemini') {
+
+  /**
+   * Test API connectivity
+   * @returns {Promise<boolean>} True if API is accessible
+   */
+  async testConnection() {
     try {
-      const response = await fetch(`/api/ai/translate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: code,
-          fromLanguage,
-          toLanguage,
-          modelProvider
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      return data.result;
+      await this.checkStatus();
+      return true;
     } catch (error) {
-      console.error('Error translating code:', error);
-      throw error;
+      console.error('API connection test failed:', error);
+      return false;
     }
   }
 }

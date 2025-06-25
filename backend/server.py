@@ -3,6 +3,7 @@ from flask_cors import CORS
 import logging
 import os
 import time
+import re
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -32,12 +33,17 @@ except ImportError:
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app) 
+
+# ============================================================================
+# HELPER FUNCTIONS
+# ============================================================================
 
 def get_prompt_from_request():
+    """Extract prompt and model provider from request"""
     data = request.get_json()
     if not data or 'prompt' not in data:
-        return None, jsonify({'error': 'Missing "prompt" in request body'}), 400
+        return None, None, jsonify({'error': 'Missing "prompt" in request body'}), 400
     
     # Extract additional parameters if available
     model_provider = data.get('modelProvider', 'gemini')  # Default to Gemini if not specified
@@ -78,22 +84,98 @@ def format_code_generation_prompt(prompt, language="javascript", complexity="int
         """
     return formatted_prompt
 
-@app.route('/api/status')
-def api_status():
-    return jsonify({
-        "status": "online",
-        "endpoints": {
-            "generate": "/api/ai/generate",
-            "explain": "/api/ai/explain"
-        },
-        "api_keys": {
-            "gemini": bool(gemini_api_key),
-            "groq": bool(groq_api_key)
-        }
-    })
+def format_code_translation_prompt(code, source_language, target_language):
+    """Format the prompt for code translation"""
+    formatted_prompt = f"""
+        Translate the following code from {source_language} to {target_language}.
+        Maintain the same functionality and logic while following {target_language} conventions and best practices.
+        Return only the translated code in a code block with the appropriate syntax for {target_language}.
+        Do not include any explanations or additional text outside the code block.
+
+        Source Code ({source_language}):
+        {code}
+
+        Translate to {target_language}:
+        """
+    return formatted_prompt
+
+def format_code_optimization_prompt(code, language):
+    """Format the prompt for code optimization"""
+    formatted_prompt = f"""
+        Analyze and optimize the following {language} code. Provide specific optimization suggestions including:
+        1. Performance improvements
+        2. Code readability enhancements
+        3. Best practices recommendations
+        4. Security considerations (if applicable)
+        5. Memory usage optimizations
+
+        Provide both the optimized code and a brief explanation of the changes made.
+
+        Original Code:
+        {code}
+
+        Please provide:
+        1. The optimized code in a code block
+        2. A brief explanation of the optimizations made
+        """
+    return formatted_prompt
+
+def extract_code_blocks(response_text):
+    """Extract code blocks from AI response"""
+    # First try to find code blocks with language specified
+    code_block_pattern = r"```(\w+)?\n([\s\S]*?)```"
+    matches = re.findall(code_block_pattern, response_text)
+    
+    if matches:
+        language, code = matches[0]
+        # Return with formatting that frontend expects for parsing
+        return f"```{language}\n{code.strip()}\n```"
+    
+    # If no match with language, try generic code blocks
+    code_block_pattern = r"```([\s\S]*?)```"
+    code_blocks = re.findall(code_block_pattern, response_text)
+    if code_blocks:
+        # Return with formatting that frontend expects for parsing
+        return f"```\n{code_blocks[0].strip()}\n```"
+    
+    # If no code blocks at all
+    return response_text.strip()
+
+def call_ai_model(model_provider, prompt, model_name_gemini="gemini-2.0-flash", model_name_groq="llama-3.3-70b-versatile"):
+    """Generic function to call AI models"""
+    if model_provider.lower() == 'gemini':
+        if not gemini_api_key:
+            raise Exception("Gemini API key not configured in environment variables")
+            
+        response = genai_client.models.generate_content(
+            model=model_name_gemini,
+            contents=[prompt]
+        )
+        return response.text, model_name_gemini
+        
+    elif model_provider.lower() == 'groq':
+        if not groq_api_key:
+            raise Exception("Groq API key not configured in environment variables")
+            
+        completion = groq_client.chat.completions.create(
+            model=model_name_groq,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7,
+            max_tokens=2048,
+            top_p=1,
+            stop=None,
+        )
+        return completion.choices[0].message.content, model_name_groq
+    else:
+        raise Exception(f"Unsupported model provider: {model_provider}. Supported providers are 'gemini' and 'groq'.")
+
+# ============================================================================
+# API ROUTES
+# ============================================================================
 
 @app.route('/api/ai/generate', methods=['POST'])
 def generate_code():
+    """Generate code from natural language description"""
     try:
         prompt, model_provider, error_response, status = get_prompt_from_request()
         if error_response:
@@ -101,49 +183,12 @@ def generate_code():
             
         # Format the prompt with our helper function
         formatted_prompt = format_code_generation_prompt(prompt)
-        print(f"Using model provider: {model_provider}")
-        print(formatted_prompt)
         
         start_time = time.time()
-        response_text = ""
-        model_name = ""
+        response_text, model_name = call_ai_model(model_provider, formatted_prompt)
         
-        # Use the specified model provider
-        if model_provider.lower() == 'gemini':
-            if not gemini_api_key:
-                return jsonify({"error": "Gemini API key not configured in environment variables"}), 500
-                
-            model_name = "gemini-2.0-flash"
-            response = genai_client.models.generate_content(
-                model=model_name,
-                contents=[formatted_prompt]
-            )
-            response_text = response.text
-            
-        elif model_provider.lower() == 'groq':
-            if not groq_api_key:
-                return jsonify({"error": "Groq API key not configured in environment variables"}), 500
-                
-            model_name = "llama-3.3-70b-versatile"
-            completion = groq_client.chat.completions.create(
-                model=model_name,
-                messages=[{"role": "user", "content": formatted_prompt}],
-                temperature=0.7,
-                max_tokens=2048,
-                top_p=1,
-                stop=None,
-            )
-            response_text = completion.choices[0].message.content
-        else:
-            return jsonify({"error": f"Unsupported model provider: {model_provider}. Supported providers are 'gemini' and 'groq'."}), 400        # Process the response to extract only the code
-        
-        # Extract code blocks if they exist (between triple backticks)
-        import re
-        code_block_pattern = r"```(?:\w*\n)?([\s\S]*?)```"
-        code_blocks = re.findall(code_block_pattern, response_text)
-        
-        # Use the extracted code if found, otherwise use the full response
-        clean_code = code_blocks[0].strip() if code_blocks else response_text.strip()
+        # Extract code blocks if they exist
+        clean_code = extract_code_blocks(response_text)
         
         elapsed_time = time.time() - start_time
         return jsonify({
@@ -158,6 +203,7 @@ def generate_code():
 
 @app.route('/api/ai/explain', methods=['POST'])
 def explain_code():
+    """Explain existing code"""
     try:
         prompt, model_provider, error_response, status = get_prompt_from_request()
         if error_response:
@@ -166,37 +212,7 @@ def explain_code():
         explain_prompt = f"Explain this code in clear, concise terms:\n\n{prompt}"
         
         start_time = time.time()
-        response_text = ""
-        model_name = ""
-        
-        # Use the specified model provider
-        if model_provider.lower() == 'gemini':
-            if not gemini_api_key:
-                return jsonify({"error": "Gemini API key not configured in environment variables"}), 500
-                
-            model_name = "gemini-2.0-flash"
-            response = genai_client.models.generate_content(
-                model=model_name,
-                contents=[explain_prompt]
-            )
-            response_text = response.text
-            
-        elif model_provider.lower() == 'groq':
-            if not groq_api_key:
-                return jsonify({"error": "Groq API key not configured in environment variables"}), 500
-                
-            model_name = "llama-3.3-70b-versatile"
-            completion = groq_client.chat.completions.create(
-                model=model_name,
-                messages=[{"role": "user", "content": explain_prompt}],
-                temperature=0.7,
-                max_tokens=2048,
-                top_p=1,
-                stop=None,
-            )
-            response_text = completion.choices[0].message.content
-        else:
-            return jsonify({"error": f"Unsupported model provider: {model_provider}. Supported providers are 'gemini' and 'groq'."}), 400
+        response_text, model_name = call_ai_model(model_provider, explain_prompt)
         
         elapsed_time = time.time() - start_time
         return jsonify({
@@ -208,6 +224,73 @@ def explain_code():
     except Exception as e:
         logger.error(f"Error in explain_code endpoint: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
+@app.route('/api/ai/translate', methods=['POST'])
+def translate_code():
+    """Translate code from one language to another"""
+    try:
+        data = request.get_json()
+        if not data or 'code' not in data:
+            return jsonify({'error': 'Missing "code" in request body'}), 400
+        
+        code = data['code']
+        source_language = data.get('sourceLanguage', 'javascript')
+        target_language = data.get('targetLanguage', 'python')
+        model_provider = data.get('modelProvider', 'gemini')
+        
+        formatted_prompt = format_code_translation_prompt(code, source_language, target_language)
+        
+        start_time = time.time()
+        response_text, model_name = call_ai_model(model_provider, formatted_prompt)
+        
+        # Extract code blocks if they exist
+        translated_code = extract_code_blocks(response_text)
+        
+        elapsed_time = time.time() - start_time
+        return jsonify({
+            "model": model_name,
+            "modelProvider": model_provider,
+            "sourceLanguage": source_language,
+            "targetLanguage": target_language,
+            "result": translated_code,
+            "time_taken": f"{elapsed_time:.2f} seconds"
+        })
+    except Exception as e:
+        logger.error(f"Error in translate_code endpoint: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/ai/optimize', methods=['POST'])
+def optimize_code():
+    """Optimize existing code"""
+    try:
+        data = request.get_json()
+        if not data or 'code' not in data:
+            return jsonify({'error': 'Missing "code" in request body'}), 400
+        
+        code = data['code']
+        language = data.get('language', 'javascript')
+        model_provider = data.get('modelProvider', 'gemini')
+        
+        formatted_prompt = format_code_optimization_prompt(code, language)
+        
+        start_time = time.time()
+        response_text, model_name = call_ai_model(model_provider, formatted_prompt)
+        
+        elapsed_time = time.time() - start_time
+        return jsonify({
+            "model": model_name,
+            "modelProvider": model_provider,
+            "language": language,
+            "result": response_text,
+            "time_taken": f"{elapsed_time:.2f} seconds"
+        })
+    except Exception as e:
+        logger.error(f"Error in optimize_code endpoint: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+# ============================================================================
+# MAIN APPLICATION
+# ============================================================================
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000) 

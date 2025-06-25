@@ -1,0 +1,95 @@
+/* CodeBlock.css - Custom styling for syntax highlighted code */
+
+.code-container {
+  font-family: inherit;
+  line-height: 1.5;
+  tab-size: 2;
+}
+
+.code-container .hljs {
+  display: block;
+  overflow-x: auto;
+  color: #abb2bf;
+  background: transparent;
+}
+
+.code-container code {
+  font-family: inherit;
+}
+
+/* Line number styling */
+.code-container .line-number {
+  display: inline-block;
+  width: 2em;
+  color: #606060;
+  text-align: right;
+  margin-right: 1em;
+  user-select: none;
+}
+
+/* Token coloring - common languages */
+.code-container .hljs-keyword,
+.code-container .hljs-selector-tag {
+  color: #c678dd; /* purple */
+}
+
+.code-container .hljs-built_in {
+  color: #56b6c2; /* teal */
+}
+
+.code-container .hljs-type,
+.code-container .hljs-section,
+.code-container .hljs-attribute,
+.code-container .hljs-name {
+  color: #e5c07b; /* yellow */
+}
+
+.code-container .hljs-string,
+.code-container .hljs-bullet,
+.code-container .hljs-addition,
+.code-container .hljs-selector-pseudo {
+  color: #98c379; /* green */
+}
+
+.code-container .hljs-title,
+.code-container .hljs-selector-id,
+.code-container .hljs-selector-class {
+  color: #61aeee; /* blue */
+}
+
+.code-container .hljs-comment,
+.code-container .hljs-quote,
+.code-container .hljs-meta {
+  color: #5c6370; /* grey */
+  font-style: italic;
+}
+
+.code-container .hljs-doctag,
+.code-container .hljs-formula {
+  color: #c678dd;
+}
+
+.code-container .hljs-deletion,
+.code-container .hljs-selector-attr,
+.code-container .hljs-subst {
+  color: #e06c75; /* red */
+}
+
+.code-container .hljs-variable,
+.code-container .hljs-template-variable,
+.code-container .hljs-tag,
+.code-container .hljs-literal {
+  color: #d19a66; /* orange */
+}
+
+.code-container .hljs-number {
+  color: #d19a66; /* orange */
+}
+
+.code-container .hljs-emphasis {
+  font-style: italic;
+}
+
+.code-container .hljs-strong {
+  font-weight: bold;
+}

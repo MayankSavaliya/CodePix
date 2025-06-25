@@ -40,12 +40,11 @@ export default function AuthModal({ onClose, onSuccess }) {
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
       <Card className="w-full max-w-md bg-neutral-900 border-neutral-800 shadow-2xl">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-white">
+        <CardHeader className="text-center">          <CardTitle className="text-2xl font-bold text-white">
             {isSignUp ? 'Create Account' : 'Welcome Back'}
           </CardTitle>
           <p className="text-neutral-400">
-            {isSignUp ? 'Join Snippix to save and sync your snippets' : 'Sign in to access your snippets'}
+            {isSignUp ? 'Join CodePix to save and sync your snippets' : 'Sign in to access your snippets'}
           </p>
         </CardHeader>
         
