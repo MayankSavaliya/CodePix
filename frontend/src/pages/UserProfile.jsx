@@ -1,23 +1,19 @@
 import { useState, useEffect } from "react";
 import { useAuthStore } from "../store/use-auth-store";
-import { usePreferencesStore } from "../store/use-preferences-store";
 import { Card, CardHeader, CardContent, CardTitle, CardFooter } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { toast } from "react-hot-toast";
-import { LogOut, User, Settings, Zap, ShieldAlert, ChevronLeft, ChevronRight, Mail, Calendar, Menu, X } from "lucide-react";
-import { themes, fonts, languages } from "../options";
+import { LogOut, User, Zap, ShieldAlert, ChevronLeft, ChevronRight, Mail, Calendar, Menu, X } from "lucide-react";
 
 const SIDEBAR_SECTIONS = [
   { id: "profile", label: "Profile", icon: User },
-  { id: "settings", label: "Settings", icon: Settings },
   { id: "ai", label: "AI Usage", icon: Zap },
   { id: "danger", label: "Danger Zone", icon: ShieldAlert },
 ];
 
 export default function UserProfile() {
   const { user, updateUserProfile, signOut } = useAuthStore();
-  const preferences = usePreferencesStore();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [section, setSection] = useState("profile");
@@ -26,11 +22,6 @@ export default function UserProfile() {
   const [profileLoading, setProfileLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(user?.photoURL || "");
   const [avatarInput, setAvatarInput] = useState("");
-  const [theme, setTheme] = useState(preferences.theme);
-  const [fontStyle, setFontStyle] = useState(preferences.fontStyle);
-  const [fontSize, setFontSize] = useState(preferences.fontSize);
-  const [autoSave, setAutoSave] = useState(false);
-  const [defaultLang, setDefaultLang] = useState(preferences.language);
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordLoading, setPasswordLoading] = useState(false);
@@ -79,15 +70,6 @@ export default function UserProfile() {
     if (!avatarInput.trim()) return;
     setAvatarUrl(avatarInput.trim());
     setAvatarInput("");
-  };
-
-  // Preferences Save
-  const handleSavePreferences = () => {
-    preferences.setTheme(theme);
-    preferences.setFontStyle(fontStyle);
-    preferences.setFontSize(fontSize);
-    preferences.setLanguage(defaultLang);
-    toast.success("All preferences saved!");
   };
 
   // Password change functionality (UI only)
@@ -358,262 +340,13 @@ export default function UserProfile() {
               <Card className="bg-neutral-900/50 backdrop-blur border-neutral-800 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/10 transition-all duration-300 group cursor-pointer sm:col-span-2 lg:col-span-1">
                 <CardContent className="p-6 text-center">
                   <div className="w-14 h-14 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:bg-gradient-to-r group-hover:from-orange-500/30 group-hover:to-red-500/30 transition-all duration-300">
-                    <Settings className="w-7 h-7 text-orange-400 group-hover:text-orange-300" />
+                    <Zap className="w-7 h-7 text-orange-400 group-hover:text-orange-300" />
                   </div>
                   <div className="text-3xl lg:text-4xl font-bold text-white mb-2 group-hover:text-orange-300 transition-colors">{user.plan || "Free"}</div>
                   <div className="text-sm text-neutral-400 group-hover:text-neutral-300 transition-colors">Current Plan</div>
                 </CardContent>
               </Card>
             </div>
-          </div>
-        )}
-
-        {/* Settings */}
-        {section === "settings" && (
-          <div className="fade-in">
-            <Card className="bg-neutral-900/50 backdrop-blur border-neutral-800 shadow-lg hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-300">
-              <CardHeader className="border-b border-neutral-800">
-                <CardTitle className="text-xl lg:text-2xl text-white flex items-center gap-2">
-                  <Settings className="w-5 h-5 lg:w-6 lg:h-6" />
-                  Preferences
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 lg:p-8 space-y-8">
-                {/* Visual Preferences */}
-                <div className="space-y-6">
-                  <h3 className="text-lg font-semibold text-white border-b border-neutral-800 pb-2">Visual Appearance</h3>
-                  
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-                    {/* Theme */}
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-neutral-300 mb-3">Theme</label>
-                      <select 
-                        value={theme} 
-                        onChange={e => setTheme(e.target.value)} 
-                        className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all hover:bg-neutral-800/70"
-                      >
-                        {Object.entries(themes).map(([key, themeData]) => (
-                          <option key={key} value={key}>
-                            {key.charAt(0).toUpperCase() + key.slice(1)}
-                          </option>
-                        ))}
-                      </select>
-                      <div className="mt-2 flex items-center gap-2">
-                        <div className={`w-4 h-4 rounded-full border border-neutral-600 ${themes[theme]?.background || 'bg-neutral-700'}`}></div>
-                        <span className="text-xs text-neutral-400">Preview</span>
-                      </div>
-                    </div>
-                    
-                    {/* Font Family */}
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-neutral-300 mb-3">Font Family</label>
-                      <select 
-                        value={fontStyle} 
-                        onChange={e => setFontStyle(e.target.value)} 
-                        className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all hover:bg-neutral-800/70"
-                      >
-                        {Object.entries(fonts).map(([key, font]) => (
-                          <option key={key} value={key}>
-                            {font.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    
-                    {/* Font Size */}
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-neutral-300 mb-3">
-                        Font Size: {fontSize}px
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="range"
-                          min={10}
-                          max={32}
-                          value={fontSize}
-                          onChange={e => setFontSize(Number(e.target.value))}
-                          className="w-full h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer slider"
-                        />
-                        <div className="flex justify-between text-xs text-neutral-500 mt-1">
-                          <span>10px</span>
-                          <span>32px</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Padding */}
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-neutral-300 mb-3">
-                        Padding: {preferences.padding}px
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="range"
-                          min={16}
-                          max={128}
-                          step={8}
-                          value={preferences.padding}
-                          onChange={e => preferences.setPadding(Number(e.target.value))}
-                          className="w-full h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer slider"
-                        />
-                        <div className="flex justify-between text-xs text-neutral-500 mt-1">
-                          <span>16px</span>
-                          <span>128px</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Toggle Switches */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex items-center justify-between p-4 bg-neutral-800/30 rounded-lg border border-neutral-700">
-                      <div>
-                        <div className="text-sm font-medium text-neutral-300">Show Background</div>
-                        <div className="text-xs text-neutral-500">Display gradient background</div>
-                      </div>
-                      <input 
-                        type="checkbox" 
-                        checked={preferences.showBackground} 
-                        onChange={e => preferences.toggleBackground()} 
-                        className="w-5 h-5 text-purple-600 bg-neutral-700 border-neutral-600 rounded focus:ring-purple-500"
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 bg-neutral-800/30 rounded-lg border border-neutral-700">
-                      <div>
-                        <div className="text-sm font-medium text-neutral-300">Dark Mode</div>
-                        <div className="text-xs text-neutral-500">Use dark theme</div>
-                      </div>
-                      <input 
-                        type="checkbox" 
-                        checked={preferences.darkMode} 
-                        onChange={e => preferences.toggleDarkMode()} 
-                        className="w-5 h-5 text-purple-600 bg-neutral-700 border-neutral-600 rounded focus:ring-purple-500"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Code Editor Preferences */}
-                <div className="space-y-6">
-                  <h3 className="text-lg font-semibold text-white border-b border-neutral-800 pb-2">Code Editor</h3>
-                  
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-                    {/* Default Language */}
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-neutral-300 mb-3">Default Language</label>
-                      <select 
-                        value={defaultLang} 
-                        onChange={e => setDefaultLang(e.target.value)} 
-                        className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all hover:bg-neutral-800/70"
-                      >
-                        {Object.entries(languages).map(([key, name]) => (
-                          <option key={key} value={key}>
-                            {name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Auto-detect Language */}
-                    <div className="flex items-center justify-between p-4 bg-neutral-800/30 rounded-lg border border-neutral-700">
-                      <div>
-                        <div className="text-sm font-medium text-neutral-300">Auto-detect Language</div>
-                        <div className="text-xs text-neutral-500">Automatically detect programming language</div>
-                      </div>
-                      <input 
-                        type="checkbox" 
-                        checked={preferences.autoDetectLanguage} 
-                        onChange={e => preferences.setAutoDetectLanguage(e.target.checked)} 
-                        className="w-5 h-5 text-purple-600 bg-neutral-700 border-neutral-600 rounded focus:ring-purple-500"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Application Preferences */}
-                <div className="space-y-6">
-                  <h3 className="text-lg font-semibold text-white border-b border-neutral-800 pb-2">Application</h3>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex items-center justify-between p-4 bg-neutral-800/30 rounded-lg border border-neutral-700">
-                      <div>
-                        <div className="text-sm font-medium text-neutral-300">Auto-save Changes</div>
-                        <div className="text-xs text-neutral-500">Automatically save while editing</div>
-                      </div>
-                      <input 
-                        type="checkbox" 
-                        checked={autoSave} 
-                        onChange={e => setAutoSave(e.target.checked)} 
-                        className="w-5 h-5 text-purple-600 bg-neutral-700 border-neutral-600 rounded focus:ring-purple-500"
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 bg-neutral-800/30 rounded-lg border border-neutral-700">
-                      <div>
-                        <div className="text-sm font-medium text-neutral-300">Show Welcome Screen</div>
-                        <div className="text-xs text-neutral-500">Show landing page for new users</div>
-                      </div>
-                      <input 
-                        type="checkbox" 
-                        checked={true} 
-                        onChange={e => {}} 
-                        className="w-5 h-5 text-purple-600 bg-neutral-700 border-neutral-600 rounded focus:ring-purple-500"
-                        disabled
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Preview Section */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-white border-b border-neutral-800 pb-2">Live Preview</h3>
-                  <div className="bg-neutral-800/30 rounded-lg p-6 border border-neutral-700">
-                    <div 
-                      className={`rounded-lg p-4 ${preferences.showBackground ? themes[theme]?.background || 'bg-neutral-700' : 'bg-neutral-700 border border-neutral-600'}`}
-                      style={{ padding: `${Math.max(preferences.padding / 4, 16)}px`, fontFamily: fonts[fontStyle]?.name || 'monospace' }}
-                    >
-                      <pre className="text-white" style={{ fontSize: `${fontSize}px`, fontFamily: fonts[fontStyle]?.name || 'monospace' }}>
-                        <code>{`function hello() {\n  console.log("Hello, World!");\n  return true;\n}`}</code>
-                      </pre>
-                    </div>
-                    <div className="text-xs text-neutral-500 mt-2">
-                      Theme: {theme} • Font: {fonts[fontStyle]?.name} • Size: {fontSize}px • Padding: {preferences.padding}px
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                  <Button 
-                    onClick={handleSavePreferences} 
-                    className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 flex-1 sm:flex-none px-8 py-3"
-                  >
-                    Save All Preferences
-                  </Button>
-                  <Button 
-                    onClick={() => {
-                      // Reset to defaults
-                      setTheme('hyper');
-                      setFontStyle('jetBrainsMono');
-                      setFontSize(16);
-                      setDefaultLang('javascript');
-                      setAutoSave(false);
-                      preferences.setPadding(64);
-                      preferences.toggleBackground();
-                      if (!preferences.showBackground) preferences.toggleBackground();
-                      if (!preferences.darkMode) preferences.toggleDarkMode();
-                      preferences.setAutoDetectLanguage(false);
-                      toast.success('Reset to defaults!');
-                    }} 
-                    variant="outline" 
-                    className="border-neutral-700 hover:bg-neutral-800 flex-1 sm:flex-none"
-                  >
-                    Reset to Defaults
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         )}
 

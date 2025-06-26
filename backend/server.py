@@ -15,21 +15,34 @@ logger = logging.getLogger(__name__)
 
 # Google Gemini - use environment variable for API key
 try:
-    from google import genai
+    import google.generativeai as genai
     gemini_api_key = os.getenv("GEMINI_API_KEY")
-    genai_client = genai.Client(api_key=gemini_api_key) if gemini_api_key else None
+    if gemini_api_key:
+        genai.configure(api_key=gemini_api_key)
+        genai_client = genai
+        logger.info("Gemini client initialized successfully")
+    else:
+        genai_client = None
+        logger.warning("GEMINI_API_KEY not found in environment variables")
 except ImportError:
     genai_client = None
     gemini_api_key = None
+    logger.warning("Google Gemini library not installed")
 
 # Groq models - use environment variable for API key
 try:
     from groq import Groq
     groq_api_key = os.getenv("GROQ_API_KEY")
-    groq_client = Groq(api_key=groq_api_key) if groq_api_key else None
+    if groq_api_key:
+        groq_client = Groq(api_key=groq_api_key)
+        logger.info("Groq client initialized successfully")
+    else:
+        groq_client = None
+        logger.warning("GROQ_API_KEY not found in environment variables")
 except ImportError:
     groq_client = None
     groq_api_key = None
+    logger.warning("Groq library not installed")
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -141,21 +154,19 @@ def extract_code_blocks(response_text):
     # If no code blocks at all
     return response_text.strip()
 
-def call_ai_model(model_provider, prompt, model_name_gemini="gemini-2.0-flash", model_name_groq="llama-3.3-70b-versatile"):
+def call_ai_model(model_provider, prompt, model_name_gemini="gemini-2.0-flash-exp", model_name_groq="llama-3.3-70b-versatile"):
     """Generic function to call AI models"""
     if model_provider.lower() == 'gemini':
-        if not gemini_api_key:
-            raise Exception("Gemini API key not configured in environment variables")
+        if not genai_client:
+            raise Exception("Gemini client not available. Please check GEMINI_API_KEY environment variable and ensure google-generativeai library is installed.")
             
-        response = genai_client.models.generate_content(
-            model=model_name_gemini,
-            contents=[prompt]
-        )
+        model = genai_client.GenerativeModel(model_name_gemini)
+        response = model.generate_content(prompt)
         return response.text, model_name_gemini
         
     elif model_provider.lower() == 'groq':
-        if not groq_api_key:
-            raise Exception("Groq API key not configured in environment variables")
+        if not groq_client:
+            raise Exception("Groq client not available. Please check GROQ_API_KEY environment variable and ensure groq library is installed.")
             
         completion = groq_client.chat.completions.create(
             model=model_name_groq,

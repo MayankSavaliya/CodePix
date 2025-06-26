@@ -21,6 +21,7 @@ import UserProfile from "./components/auth/UserProfile";
 import SnippetLibrary from "./components/snippets/SnippetLibrary";
 import AiSidebar from "./components/ai/AiSidebar";
 import { Toaster } from "react-hot-toast";
+import { PanelRightClose, PanelRightOpen } from "lucide-react";
 import './App.css';
 
 function App() {
@@ -28,6 +29,8 @@ function App() {
   const [showWidth, setShowWidth] = useState(false);
   const [showSnippetLibrary, setShowSnippetLibrary] = useState(false);
   const [showAiSidebar, setShowAiSidebar] = useState(false);
+  const [showRightSidebar, setShowRightSidebar] = useState(false);
+  const [activePanel, setActivePanel] = useState("customization"); // "customization" or "ai"
 
   const theme = usePreferencesStore((state) => state.theme);
   const padding = usePreferencesStore((state) => state.padding);
@@ -51,6 +54,26 @@ function App() {
       padding: Number(state.padding || 64),
     });
   }, []);
+
+  // Function to show customization panel
+  const showCustomization = () => {
+    setActivePanel("customization");
+    setShowRightSidebar(true);
+    setShowAiSidebar(false);
+  };
+
+  // Function to show AI panel
+  const showAI = () => {
+    setActivePanel("ai");
+    setShowRightSidebar(true);
+    setShowAiSidebar(true);
+  };
+
+  // Function to hide panel
+  const hidePanel = () => {
+    setShowRightSidebar(false);
+    setShowAiSidebar(false);
+  };
 
   return (
     <div className="dark min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 text-white">
@@ -86,6 +109,20 @@ function App() {
 
             {/* Navigation Actions */}
             <div className="flex items-center gap-3">
+              {/* Hide Panel Button - Only show when panel is visible */}
+              {showRightSidebar && (
+                <Button
+                  onClick={hidePanel}
+                  variant="outline"
+                  size="sm"
+                  className="bg-neutral-800/50 border-neutral-700 text-white hover:bg-neutral-700 hover:border-purple-500/50 transition-all duration-200 hover:shadow-lg hover:shadow-purple-500/10"
+                  title="Hide Panel"
+                >
+                  <PanelRightClose className="mr-2 h-4 w-4" />
+                  <span className="hidden sm:inline">Hide Panel</span>
+                </Button>
+              )}
+
               <Button
                 onClick={() => setShowSnippetLibrary(true)}
                 variant="outline"
@@ -98,12 +135,30 @@ function App() {
                 <span className="hidden sm:inline">My Snippets</span>
               </Button>
 
+              {/* Customization Button */}
               <Button
-                onClick={() => setShowAiSidebar(!showAiSidebar)}
+                onClick={showCustomization}
+                variant="outline"
+                size="sm"
+                className={`border-blue-500/50 transition-all ${
+                  showRightSidebar && activePanel === "customization"
+                    ? 'bg-blue-600 text-white border-blue-400' 
+                    : 'bg-neutral-800/50 border-neutral-700 text-white hover:bg-neutral-700'
+                }`}
+              >
+                <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                </svg>
+                <span className="hidden sm:inline">Customize</span>
+              </Button>
+
+              {/* AI Features Button */}
+              <Button
+                onClick={showAI}
                 variant="outline"
                 size="sm"
                 className={`border-purple-500/50 transition-all ${
-                  showAiSidebar 
+                  showRightSidebar && activePanel === "ai"
                     ? 'bg-purple-600 text-white border-purple-400' 
                     : 'bg-neutral-800/50 border-neutral-700 text-white hover:bg-neutral-700'
                 }`}
@@ -122,10 +177,18 @@ function App() {
 
       {/* Main Content Area */}
       <main className="container mx-auto px-4 py-6 max-w-7xl transition-all duration-300">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className={cn(
+          "grid gap-6 transition-all duration-300",
+          showRightSidebar 
+            ? "grid-cols-1 lg:grid-cols-5" 
+            : "grid-cols-1"
+        )}>
           
-          {/* Left Side - Code Editor (Now placed first with 60% width - 3/5) */}
-          <div className="lg:col-span-3 order-1 flex flex-col items-center justify-center">
+          {/* Left Side - Code Editor */}
+          <div className={cn(
+            "order-1 flex flex-col items-center justify-center transition-all duration-300",
+            showRightSidebar ? "lg:col-span-3" : "lg:col-span-1"
+          )}>
             <div className="w-full">
               <Resizable
                 enable={{ left: true, right: true }}
@@ -176,58 +239,60 @@ function App() {
             </div>
           </div>
 
-          {/* Right Side - Either Customization Panel or AI Panel (40% width - 2/5) */}
-          <div className="lg:col-span-2 order-2">
-            <div className="h-[calc(100vh-100px)] flex flex-col lg:sticky lg:top-24 overflow-visible pr-1">
-              {!showAiSidebar ? (
-                /* Customization Panel */
-                <div className="flex flex-col h-full">
-                  <Card className="bg-neutral-900/50 backdrop-blur border-neutral-800 rounded-lg shadow-lg flex-1">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-md font-semibold text-neutral-200">
-                        Appearance
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-2 gap-3">
-                        <ThemeSelect />
-                        <LanguageSelect />
-                        <FontSelect />
-                        <FontSizeInput />
-                        <PaddingSlider />
-                        <div className="flex items-center justify-between">
-                          <BackgroundSwitch />
-                          <DarkModeSwitch />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-neutral-900/50 backdrop-blur border-neutral-800 rounded-lg shadow-lg mt-3 mb-3">
-                    <CardHeader className="pb-3 pt-3">
-                      <div className="flex justify-between items-center">
+          {/* Right Side - Either Customization Panel or AI Panel */}
+          {showRightSidebar && (
+            <div className="lg:col-span-2 order-2">
+              <div className="h-[calc(100vh-100px)] flex flex-col lg:sticky lg:top-24 overflow-visible pr-1">
+                {activePanel === "customization" ? (
+                  /* Customization Panel */
+                  <div className="flex flex-col h-full">
+                    <Card className="bg-neutral-900/50 backdrop-blur border-neutral-800 rounded-lg shadow-lg flex-1">
+                      <CardHeader className="pb-3">
                         <CardTitle className="text-md font-semibold text-neutral-200">
-                          Export
+                          Appearance
                         </CardTitle>
-                        <div className="z-10">
-                          <ExportOptions targetRef={editorRef} />
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-3">
+                          <ThemeSelect />
+                          <LanguageSelect />
+                          <FontSelect />
+                          <FontSizeInput />
+                          <PaddingSlider />
+                          <div className="flex items-center justify-between">
+                            <BackgroundSwitch />
+                            <DarkModeSwitch />
+                          </div>
                         </div>
-                      </div>
-                    </CardHeader>
-                  </Card>
-                </div>
-              ) : (
-                /* AI Sidebar - Embedded directly in the layout */
-                <div className="bg-neutral-900/50 backdrop-blur border border-neutral-800 rounded-lg overflow-hidden h-full flex-1 shadow-lg">
-                  <AiSidebar 
-                    isOpen={showAiSidebar}
-                    onToggle={() => setShowAiSidebar(!showAiSidebar)}
-                    inline={true}
-                  />
-                </div>
-              )}
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-neutral-900/50 backdrop-blur border-neutral-800 rounded-lg shadow-lg mt-3 mb-3">
+                      <CardHeader className="pb-3 pt-3">
+                        <div className="flex justify-between items-center">
+                          <CardTitle className="text-md font-semibold text-neutral-200">
+                            Export
+                          </CardTitle>
+                          <div className="z-10">
+                            <ExportOptions targetRef={editorRef} />
+                          </div>
+                        </div>
+                      </CardHeader>
+                    </Card>
+                  </div>
+                ) : (
+                  /* AI Sidebar - Embedded directly in the layout */
+                  <div className="bg-neutral-900/50 backdrop-blur border border-neutral-800 rounded-lg overflow-hidden h-full flex-1 shadow-lg">
+                    <AiSidebar 
+                      isOpen={showAiSidebar}
+                      onToggle={() => setShowAiSidebar(!showAiSidebar)}
+                      inline={true}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
 
