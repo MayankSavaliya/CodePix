@@ -20,7 +20,6 @@ import ExportOptions from "./components/controls/ExportOptions";
 import UserProfile from "./components/auth/UserProfile";
 import SnippetLibrary from "./components/snippets/SnippetLibrary";
 import AiSidebar from "./components/ai/AiSidebar";
-import { Toaster } from "react-hot-toast";
 import { PanelRightClose, PanelRightOpen, Settings, Brain, FolderOpen, Download, Menu, X, Palette, Sparkles } from "lucide-react";
 import {
   DropdownMenu,
@@ -85,7 +84,6 @@ function App() {
 
   return (
     <div className="dark min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 text-white">
-      <Toaster toastOptions={{ className: "toast" }} />
       
       {/* Dynamic Theme and Font Links */}
       <link

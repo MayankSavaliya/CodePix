@@ -15,8 +15,9 @@ export default defineConfig({
     proxy: {
       // Proxy API requests to backend server
       '/api': {
-        // target: 'http://54.89.245.102:5000',
-        target:'http://api2.viveklokadiya.live/',
+        // target: 'http://localhost:5000',
+        target: 'http://54.89.245.102:5000',
+        // target:'http://api2.viveklokadiya.live/',
         changeOrigin: true,
         secure: false
       }

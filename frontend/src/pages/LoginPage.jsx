@@ -25,7 +25,6 @@ export default function LoginPage() {
 
     try {
       await signIn(email, password);
-      toast.success('Welcome back!');
       navigate('/');
     } catch (error) {
       // Error handling is done in the store
@@ -35,7 +34,6 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
-      toast.success('Welcome!');
       navigate('/');
     } catch (error) {
       // Error handling is done in the store

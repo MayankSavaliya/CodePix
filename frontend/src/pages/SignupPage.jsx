@@ -46,7 +46,6 @@ export default function SignupPage() {
 
     try {
       await signUp(email, password, displayName);
-      toast.success('Account created successfully!');
       navigate('/');
     } catch (error) {
       // Error handling is done in the store
@@ -56,7 +55,6 @@ export default function SignupPage() {
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
-      toast.success('Welcome!');
       navigate('/');
     } catch (error) {
       // Error handling is done in the store
