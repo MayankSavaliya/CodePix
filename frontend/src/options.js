@@ -157,42 +157,42 @@ export const fonts = {
 export const codeSnippets = [
   {
     language: "python",
-    code: "def is_prime(n):\n  if n <= 1:\n    return False\n  for i in range(2, int(n ** 0.5) + 1):\n    if n % i == 0:\n      return False\n  return True",
+    code: "def two_sum(nums, target):\n  num_map = {}\n  for i, num in enumerate(nums):\n    complement = target - num\n    if complement in num_map:\n      return [num_map[complement], i]\n    num_map[num] = i\n  return []\n\nnums = [2, 7, 11, 15]\ntarget = 9\nprint(two_sum(nums, target))  # Output: [0, 1]",
   },
   {
     language: "javascript",
-    code: "const fibonacci = (n) => {\n  if (n <= 1) return n;\n  return fibonacci(n - 1) + fibonacci(n - 2);\n};\nconsole.log(fibonacci(10));",
+    code: "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nconst twoSum = (nums, target) => {\n  const map = new Map();\n  for (let i = 0; i < nums.length; i++) {\n    const complement = target - nums[i];\n    if (map.has(complement)) {\n      return [map.get(complement), i];\n    }\n    map.set(nums[i], i);\n  }\n  return [];\n};\n\nconsole.log(twoSum([2, 7, 11, 15], 9));  // Output: [0, 1]",
   },
   {
     language: "java",
-    code: "import java.util.stream.IntStream;\n\nclass StreamExample {\n  public static void main(String[] args) {\n    IntStream.rangeClosed(1, 5).forEach(System.out::println);\n  }\n}",
+    code: "import java.util.HashMap;\nimport java.util.Map;\nimport java.util.Arrays;\n\nclass TwoSum {\n  public static int[] twoSum(int[] nums, int target) {\n    Map<Integer, Integer> map = new HashMap<>();\n    for (int i = 0; i < nums.length; i++) {\n      int complement = target - nums[i];\n      if (map.containsKey(complement)) {\n        return new int[] { map.get(complement), i };\n      }\n      map.put(nums[i], i);\n    }\n    return new int[] {};\n  }\n\n  public static void main(String[] args) {\n    int[] nums = { 2, 7, 11, 15 };\n    int target = 9;\n    System.out.println(Arrays.toString(twoSum(nums, target)));\n  }\n}",
   },
   {
     language: "c",
-    code: '#include <stdio.h>\n\nint main() {\n  for (int i = 1; i <= 10; i++) {\n    if (i % 2 == 0) {\n      printf("%d\\n", i);\n    }\n  }\n  return 0;\n}',
+    code: '#include <stdio.h>\n#include <stdlib.h>\n\n/**\n * Note: The returned array must be malloced, assume caller calls free().\n */\nint* twoSum(int* nums, int numsSize, int target, int* returnSize) {\n  int* result = malloc(2 * sizeof(int));\n  *returnSize = 2;\n  \n  for (int i = 0; i < numsSize; i++) {\n    for (int j = i + 1; j < numsSize; j++) {\n      if (nums[i] + nums[j] == target) {\n        result[0] = i;\n        result[1] = j;\n        return result;\n      }\n    }\n  }\n  \n  *returnSize = 0;\n  return NULL;\n}\n\nint main() {\n  int nums[] = {2, 7, 11, 15};\n  int target = 9;\n  int returnSize;\n  int* result = twoSum(nums, 4, target, &returnSize);\n  \n  if (returnSize > 0) {\n    printf("[%d, %d]\\n", result[0], result[1]);\n  } else {\n    printf("No solution found\\n");\n  }\n  \n  free(result);\n  return 0;\n}',
   },
   {
     language: "ruby",
-    code: 'class Animal\n  attr_reader :name\n\n  def initialize(name)\n    @name = name\n  end\n\n  def speak\n    raise NotImplementedError, "Subclasses must implement this method"\n  end\nend',
+    code: '# @param {Integer[]} nums\n# @param {Integer} target\n# @return {Integer[]}\ndef two_sum(nums, target)\n  map = {}\n  nums.each_with_index do |num, i|\n    complement = target - num\n    if map.key?(complement)\n      return [map[complement], i]\n    end\n    map[num] = i\n  end\n  []\nend\n\nputs two_sum([2, 7, 11, 15], 9).inspect # Output: [0, 1]',
   },
   {
     language: "swift",
-    code: "enum Compass {\n  case north, south, east, west\n}\nlet currentDirection = Compass.east\nprint(currentDirection)",
+    code: "func twoSum(_ nums: [Int], _ target: Int) -> [Int] {\n  var map = [Int: Int]()\n  for (i, num) in nums.enumerated() {\n    let complement = target - num\n    if let complementIndex = map[complement] {\n      return [complementIndex, i]\n    }\n    map[num] = i\n  }\n  return []\n}\n\nprint(twoSum([2, 7, 11, 15], 9)) // Output: [0, 1]",
   },
   {
     language: "csharp",
-    code: "using System;\nusing System.Linq;\n\nclass LINQExample {\n  static void Main() {\n    int[] numbers = { 3, 9, 2, 8, 6 };\n    var evenNumbers = numbers.Where(n => n % 2 == 0);\n    foreach (var num in evenNumbers) {\n      Console.WriteLine(num);\n    }\n  }\n}",
+    code: "using System;\nusing System.Collections.Generic;\n\npublic class Solution {\n  public static int[] TwoSum(int[] nums, int target) {\n    Dictionary<int, int> map = new Dictionary<int, int>();\n    for (int i = 0; i < nums.Length; i++) {\n      int complement = target - nums[i];\n      if (map.ContainsKey(complement)) {\n        return new int[] { map[complement], i };\n      }\n      if (!map.ContainsKey(nums[i])) {\n        map.Add(nums[i], i);\n      }\n    }\n    return new int[] { };\n  }\n\n  public static void Main() {\n    int[] result = TwoSum(new int[] { 2, 7, 11, 15 }, 9);\n    Console.WriteLine($\"[{result[0]}, {result[1]}]\");\n  }\n}",
   },
   {
     language: "php",
-    code: "<?php\n$fruits = ['apple', 'banana', 'cherry'];\n$uppercased = array_map('strtoupper', $fruits);\nprint_r($uppercased);\n?>",
+    code: "<?php\nfunction twoSum($nums, $target) {\n  $map = [];\n  for ($i = 0; $i < count($nums); $i++) {\n    $complement = $target - $nums[$i];\n    if (isset($map[$complement])) {\n      return [$map[$complement], $i];\n    }\n    $map[$nums[$i]] = $i;\n  }\n  return [];\n}\n\n$nums = [2, 7, 11, 15];\n$target = 9;\nprint_r(twoSum($nums, $target)); // Output: [0, 1]\n?>",
   },
   {
     language: "go",
-    code: 'package main\n\nimport (\n  "fmt"\n  "math"\n)\n\nfunc main() {\n  x := 4.0\n  y := math.Sqrt(x)\n  fmt.Printf("Square root of %.2f is %.2f\\n", x, y)\n}',
+    code: 'package main\n\nimport (\n  "fmt"\n)\n\nfunc twoSum(nums []int, target int) []int {\n  numMap := make(map[int]int)\n  for i, num := range nums {\n    complement := target - num\n    if idx, found := numMap[complement]; found {\n      return []int{idx, i}\n    }\n    numMap[num] = i\n  }\n  return []int{}\n}\n\nfunc main() {\n  nums := []int{2, 7, 11, 15}\n  target := 9\n  fmt.Println(twoSum(nums, target)) // Output: [0 1]\n}',
   },
   {
     language: "rust",
-    code: 'fn main() {\n  let mut count = 0;\n  loop {\n    println!("Count: {}", count);\n    count += 1;\n    if count > 5 {\n      break;\n    }\n  }\n}',
+    code: 'use std::collections::HashMap;\n\nfn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {\n  let mut map = HashMap::new();\n  \n  for (i, &num) in nums.iter().enumerate() {\n    let complement = target - num;\n    if let Some(&j) = map.get(&complement) {\n      return vec![j as i32, i as i32];\n    }\n    map.insert(num, i);\n  }\n  \n  vec![]\n}\n\nfn main() {\n  let nums = vec![2, 7, 11, 15];\n  let target = 9;\n  println!("{:?}", two_sum(nums, target)); // Output: [0, 1]\n}',
   },
 ];

@@ -58,7 +58,8 @@ export default function CodeEditor() {
             className="bg-transparent text-center text-gray-400 text-sm font-medium focus:outline-none"
           />
         </div>
-      </header>      <div
+      </header>      
+      <div
         className={cn(
           "px-4 pb-4",
           store.darkMode
