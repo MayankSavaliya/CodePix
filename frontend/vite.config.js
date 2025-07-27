@@ -17,7 +17,7 @@ export default defineConfig({
       '/api': {
         // target: 'http://localhost:5000',
         // target: 'http://54.89.245.102:5000',
-        target:'https://codepix-server.vercel.app/',
+        target:'https://codepix-server.vercel.app/api',
         // target:'http://api2.viveklokadiya.live/',
         changeOrigin: true,
         secure: false
