@@ -68,7 +68,7 @@ export default function AppRouter() {
               onGetStarted={() => {
                 localStorage.setItem('codepix-visited', 'true');
                 window.location.href = '/';
-              }} 
+              }}
             />
           } 
         />
