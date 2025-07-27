@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import FeatureModal from "./FeatureModal";
 import { Card } from "../../ui/card";
 import CodeDisplayBlock from "../components/CodeDisplayBlock";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const ExplainCodeContent = ({ code, language, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -164,7 +166,9 @@ const ExplainCodeContent = ({ code, language, onClose }) => {
               {/* Styled explanation block matching CodeDisplayBlock styling */}
               <div className="bg-neutral-800/80 rounded-b-lg p-4 text-sm text-neutral-100 whitespace-pre-wrap max-h-96 overflow-y-auto border border-neutral-700/50 shadow-inner">
                 <div className="prose prose-invert prose-sm max-w-none prose-headings:text-blue-300 prose-pre:bg-neutral-900/70 prose-pre:border prose-pre:border-neutral-700/50 prose-pre:rounded prose-code:text-cyan-300 prose-code:bg-neutral-900/50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-strong:text-blue-200 prose-a:text-blue-400 prose-p:leading-relaxed">
-                  {response}
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {response}
+                  </ReactMarkdown>
                 </div>
               </div>
             </div>
