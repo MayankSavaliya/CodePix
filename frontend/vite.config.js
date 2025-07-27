@@ -12,17 +12,6 @@ export default defineConfig({
       'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
       'Cross-Origin-Embedder-Policy': 'unsafe-none'
     },
-    proxy: {
-      // Proxy API requests to backend server
-      '/api': {
-        // target: 'http://localhost:5000',
-        // target: 'http://54.89.245.102:5000',
-        target:'https://codepix-server.vercel.app/api',
-        // target:'http://api2.viveklokadiya.live/',
-        changeOrigin: true,
-        secure: false
-      }
-    }
   },
   preview: {
     port: 5173,
