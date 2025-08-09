@@ -24,7 +24,7 @@ export default function AuthModal({ onClose, onSuccess }) {
       onClose();
       if (onSuccess) onSuccess();
     } catch (error) {
-      // Error handling is done in the store
+      console.error(error);
     }
   };
 
@@ -34,7 +34,7 @@ export default function AuthModal({ onClose, onSuccess }) {
       onClose();
       if (onSuccess) onSuccess();
     } catch (error) {
-      // Error handling is done in the store
+      console.error(error);
     }
   };
   return (

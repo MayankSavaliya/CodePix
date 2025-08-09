@@ -153,7 +153,6 @@ const OptimizeCodeContent = ({ code, language, onClose }) => {
                 code={extractedCode || response}
                 language={language}
                 provider={modelProvider}
-                showHeader={true}
                 title="Optimized Code"
               />
             </div>

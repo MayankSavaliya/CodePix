@@ -297,7 +297,6 @@ const GenerateCodeContent = ({ onClose }) => {
                 code={extractedCode || response}
                 language={targetLanguage}
                 provider={modelProvider}
-                showHeader={true}
                 title="Generated Code"
               />
             </div>

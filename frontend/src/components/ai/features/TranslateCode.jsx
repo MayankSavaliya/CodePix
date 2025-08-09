@@ -187,7 +187,6 @@ const TranslateCodeContent = ({ code, sourceLanguage, onClose }) => {
                 code={extractedCode || response}
                 language={targetLanguage}
                 provider={modelProvider}
-                showHeader={true}
                 title="Translated Code"
               />
             </div>

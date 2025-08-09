@@ -1,15 +1,9 @@
 class AiService {
   constructor() {
-    this.baseURL = 'https://codepix-server.vercel.app/api/ai';
-    this.timeout = 30000; // 30 seconds timeout
+    this.baseURL = 'http://localhost:5000/api/ai';
+    this.timeout = 30000;
   }
 
-  /**
-   * Make HTTP request with proper error handling and timeout
-   * @param {string} endpoint - API endpoint
-   * @param {Object} options - Fetch options
-   * @returns {Promise<Object>} Response data
-   */
   async makeRequest(endpoint, options = {}) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
@@ -33,7 +27,6 @@ class AiService {
 
       const data = await response.json();
       
-      // Validate response structure
       if (!data || typeof data !== 'object') {
         throw new Error('Invalid response format from server');
       }
@@ -54,14 +47,6 @@ class AiService {
     }
   }
 
-  /**
-   * Generate code from natural language description
-   * @param {string} prompt - Natural language description
-   * @param {string} language - Target programming language
-   * @param {string} complexity - Code complexity level
-   * @param {string} modelProvider - AI model provider (gemini/groq)
-   * @returns {Promise<string>} Generated code
-   */
   async generateCode(prompt, language = 'javascript', complexity = 'intermediate', modelProvider = 'gemini') {
     if (!prompt || typeof prompt !== 'string') {
       throw new Error('Prompt is required and must be a string');
@@ -80,13 +65,6 @@ class AiService {
     return data.result || '';
   }
 
-  /**
-   * Explain existing code
-   * @param {string} code - Code to explain
-   * @param {string} language - Programming language
-   * @param {string} modelProvider - AI model provider
-   * @returns {Promise<string>} Code explanation
-   */
   async explainCode(code, language = 'javascript', modelProvider = 'groq') {
     if (!code || typeof code !== 'string') {
       throw new Error('Code is required and must be a string');
@@ -103,13 +81,6 @@ class AiService {
     return data.result || '';
   }
 
-  /**
-   * Optimize existing code
-   * @param {string} code - Code to optimize
-   * @param {string} language - Programming language
-   * @param {string} modelProvider - AI model provider
-   * @returns {Promise<string>} Optimization suggestions
-   */
   async optimizeCode(code, language = 'javascript', modelProvider = 'groq') {
     if (!code || typeof code !== 'string') {
       throw new Error('Code is required and must be a string');
@@ -119,7 +90,7 @@ class AiService {
       method: 'POST',
       body: JSON.stringify({
         code: code.trim(),
-        language,
+        language, 
         modelProvider
       }),
     });
@@ -127,14 +98,6 @@ class AiService {
     return data.result || '';
   }
 
-  /**
-   * Translate code between programming languages
-   * @param {string} code - Source code
-   * @param {string} sourceLanguage - Source programming language
-   * @param {string} targetLanguage - Target programming language
-   * @param {string} modelProvider - AI model provider
-   * @returns {Promise<string>} Translated code
-   */
   async translateCode(code, sourceLanguage = 'javascript', targetLanguage = 'python', modelProvider = 'gemini') {
     if (!code || typeof code !== 'string') {
       throw new Error('Code is required and must be a string');
@@ -153,10 +116,6 @@ class AiService {
     return data.result || '';
   }
 
-  /**
-   * Check API status and available endpoints
-   * @returns {Promise<Object>} API status information
-   */
   async checkStatus() {
     try {
       const response = await fetch('/api/status');
@@ -169,10 +128,6 @@ class AiService {
     }
   }
 
-  /**
-   * Test API connectivity
-   * @returns {Promise<boolean>} True if API is accessible
-   */
   async testConnection() {
     try {
       await this.checkStatus();
@@ -184,6 +139,5 @@ class AiService {
   }
 }
 
-// Export singleton instance
 export const aiService = new AiService();
 export default AiService;
