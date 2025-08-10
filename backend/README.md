@@ -1,146 +1,82 @@
-# CodePix Backend API
+# CodePix Node.js Backend
 
-A Flask-based backend API that provides AI-powered code generation, explanation, translation, and optimization services using Google Gemini and Groq (LLaMA 3) models.
+A clean, organized Express.js backend for the CodePix application with AI-powered code features.
 
 ## Features
 
-- **Code Generation**: Generate code from natural language descriptions
-- **Code Explanation**: Get explanations for existing code
-- **Code Translation**: Convert code between different programming languages
-- **Code Optimization**: Get optimization suggestions for existing code
-- **Multi-Model Support**: Support for both Google Gemini and Groq (LLaMA 3) models
-
-## Setup
-
-### 1. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 2. Environment Variables
-
-Create a `.env` file in the backend directory with your API keys:
-
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
-GROQ_API_KEY=your_groq_api_key_here
-```
-
-### 3. Run the Server
-
-```bash
-python server.py
-```
-
-The server will start on `http://localhost:5000`
+- 🚀 Express.js server with proper middleware
+- 🤖 AI integrations (Gemini & Groq)
+- 🛡️ Security with Helmet and CORS
+- ⚡ Rate limiting
+- 🎯 Clean route organization
+- 📝 Proper error handling
 
 ## API Endpoints
 
-### 1. Status Check
-- **GET** `/api/status`
-- Returns server status and available endpoints
+### AI Features
 
-### 2. Code Generation
-- **POST** `/api/ai/generate`
-- **Purpose**: Generate code from natural language description
-- **Request Body**:
-  ```json
-  {
-    "prompt": "Write a function to sort an array",
-    "modelProvider": "gemini", // or "groq"
-    "language": "python",
-    "complexity": "intermediate"
-  }
-  ```
+- `POST /api/ai/generate` - Generate code from natural language
+- `POST /api/ai/explain` - Explain existing code
+- `POST /api/ai/translate` - Translate code between languages
+- `POST /api/ai/optimize` - Optimize existing code
 
-### 3. Code Explanation
-- **POST** `/api/ai/explain`
-- **Purpose**: Explain existing code
-- **Request Body**:
-  ```json
-  {
-    "prompt": "function add(a, b) { return a + b; }",
-    "modelProvider": "groq" // or "gemini"
-  }
-  ```
+### Health Check
 
-### 4. Code Translation
-- **POST** `/api/ai/translate`
-- **Purpose**: Convert code from one language to another
-- **Request Body**:
-  ```json
-  {
-    "code": "function add(a, b) { return a + b; }",
-    "sourceLanguage": "javascript",
-    "targetLanguage": "python",
+- `GET /health` - Server health status
+
+## Quick Start
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Copy environment file:
+```bash
+cp .env.example .env
+```
+
+3. Add your API keys to `.env`
+
+4. Start development server:
+```bash
+npm run dev
+```
+
+5. Start production server:
+```bash
+npm start
+```
+
+## Environment Variables
+
+- `GEMINI_API_KEY` - Google Gemini API key
+- `GROQ_API_KEY` - Groq API key
+- `PORT` - Server port (default: 5000)
+
+## Project Structure
+
+```
+backend-nodejs/
+├── server.js          # Main server file
+├── routes/
+│   └── ai.js          # AI-related routes
+├── services/
+│   └── aiService.js   # AI service logic
+├── package.json
+├── .env.example
+└── README.md
+```
+
+## Example Request
+
+```bash
+curl -X POST http://localhost:5000/api/ai/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Create a function to sort an array",
+    "language": "javascript",
+    "complexity": "intermediate",
     "modelProvider": "gemini"
-  }
-  ```
-
-### 5. Code Optimization
-- **POST** `/api/ai/optimize`
-- **Purpose**: Get optimization suggestions for code
-- **Request Body**:
-  ```json
-  {
-    "code": "def find_duplicates(arr): ...",
-    "language": "python",
-    "modelProvider": "groq"
-  }
-  ```
-
-## Response Format
-
-All endpoints return responses in the following format:
-
-```json
-{
-  "model": "model-name",
-  "modelProvider": "gemini|groq",
-  "result": "AI generated content",
-  "time_taken": "X.XX seconds"
-}
+  }'
 ```
-
-## Testing
-
-Run the comprehensive test suite:
-
-```bash
-python test_all_endpoints.py
-```
-
-Or test individual endpoints:
-
-```bash
-python test_generate_code.py
-```
-
-## Model Providers
-
-### Google Gemini
-- **Model**: `gemini-2.0-flash`
-- **Best for**: Code generation, translation
-- **API Key**: Required from Google AI Studio
-
-### Groq (LLaMA 3)
-- **Model**: `llama-3.3-70b-versatile`
-- **Best for**: Code explanation, optimization
-- **API Key**: Required from Groq
-
-## Error Handling
-
-The API includes comprehensive error handling:
-- Missing required fields
-- Invalid model providers
-- API key configuration issues
-- Network and service errors
-
-## CORS
-
-Cross-Origin Resource Sharing (CORS) is enabled for all routes to allow frontend integration.
-
-## Logging
-
-The application includes logging for debugging and monitoring purposes. Logs are output to the console with INFO level. 
