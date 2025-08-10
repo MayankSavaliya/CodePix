@@ -1,6 +1,6 @@
 class AiService {
   constructor() {
-    this.baseURL = 'http://localhost:5000/api/ai';
+    this.baseURL = 'https://codepix-backend.vercel.app/api/ai';
     this.timeout = 30000;
   }
 
