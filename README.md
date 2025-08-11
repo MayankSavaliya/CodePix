@@ -7,8 +7,8 @@
 **Create stunning, shareable code snippets with AI-powered features**
 
 [![React](https://img.shields.io/badge/React-19.1.0-61DAFB?style=flat-square&logo=react)](https://reactjs.org/)
-[![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=flat-square&logo=python)](https://python.org/)
-[![Flask](https://img.shields.io/badge/Flask-2.0+-000000?style=flat-square&logo=flask)](https://flask.palletsprojects.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=flat-square&logo=node.js)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-4.18+-000000?style=flat-square&logo=express)](https://expressjs.com/)
 [![Firebase](https://img.shields.io/badge/Firebase-Auth%20%26%20Firestore-FFCA28?style=flat-square&logo=firebase)](https://firebase.google.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.1.10-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
 
@@ -55,7 +55,6 @@
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) (v18+)
-- [Python](https://python.org/) (v3.8+)
 - [Firebase Account](https://firebase.google.com/)
 - AI API Keys (Google Gemini and/or Groq)
 
@@ -66,15 +65,15 @@
 $ git clone https://github.com/yourusername/codepix.git
 $ cd codepix/backend
 
-# 2. Install Python dependencies
-$ pip install -r requirements.txt
+# 2. Install Node.js dependencies
+$ npm install
 
 # 3. Set up environment variables
 $ cp .env.example .env
 # Edit .env and add your API keys
 
 # 4. Run the backend server
-$ python server.py
+$ npm run dev
 ```
 Backend runs at: http://localhost:5000
 
